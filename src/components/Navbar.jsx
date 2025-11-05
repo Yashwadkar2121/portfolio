@@ -12,10 +12,9 @@ const Navbar = () => {
     { name: "Projects", id: "projects" },
     { name: "Experience", id: "experience" },
     { name: "Education", id: "education" },
-    { name: "Contact Us", id: "contact" },
+    { name: "Contact", id: "contact" },
   ];
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -24,7 +23,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Handle active section
   useEffect(() => {
     const handleScroll = () => {
       const sections = navItems.map((item) => document.getElementById(item.id));
@@ -94,8 +92,10 @@ const Navbar = () => {
 
   return (
     <motion.nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b-2 ${
-        scrolled ? "bg-white/90 backdrop-blur-md shadow-lg" : "bg-transparent"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-slate-900/90 backdrop-blur-md shadow-lg border-b border-slate-700"
+          : "bg-transparent"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -105,7 +105,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <motion.div
-            className="text-2xl font-bold text-gray-800"
+            className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -120,8 +120,8 @@ const Navbar = () => {
                 onClick={() => handleNavClick(item.id)}
                 className={`relative px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                   activeSection === item.id
-                    ? "text-blue-600"
-                    : "text-gray-700 hover:text-blue-600"
+                    ? "text-cyan-400"
+                    : "text-gray-300 hover:text-cyan-400"
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -129,7 +129,7 @@ const Navbar = () => {
                 {item.name}
                 {activeSection === item.id && (
                   <motion.div
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400"
                     layoutId="activeSection"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
@@ -140,23 +140,23 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <motion.button
-            className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+            className="md:hidden p-2 rounded-lg text-gray-300 hover:bg-slate-800 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
             whileTap={{ scale: 0.95 }}
           >
             <div className="w-6 h-6 flex flex-col justify-center space-y-1">
               <motion.span
-                className="w-full h-0.5 bg-gray-700 block"
+                className="w-full h-0.5 bg-gray-300 block"
                 animate={isOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
                 transition={{ duration: 0.3 }}
               />
               <motion.span
-                className="w-full h-0.5 bg-gray-700 block"
+                className="w-full h-0.5 bg-gray-300 block"
                 animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
                 transition={{ duration: 0.3 }}
               />
               <motion.span
-                className="w-full h-0.5 bg-gray-700 block"
+                className="w-full h-0.5 bg-gray-300 block"
                 animate={isOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
                 transition={{ duration: 0.3 }}
               />
@@ -168,7 +168,7 @@ const Navbar = () => {
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              className="md:hidden bg-white/95 backdrop-blur-md rounded-lg shadow-lg overflow-hidden"
+              className="md:hidden bg-slate-800/95 backdrop-blur-md rounded-lg shadow-lg overflow-hidden border border-slate-700"
               variants={menuVariants}
               initial="closed"
               animate="open"
@@ -181,8 +181,8 @@ const Navbar = () => {
                     onClick={() => handleNavClick(item.id)}
                     className={`block w-full text-left px-4 py-3 text-sm font-medium transition-colors duration-200 ${
                       activeSection === item.id
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-700 hover:bg-gray-50"
+                        ? "bg-cyan-500/20 text-cyan-400"
+                        : "text-gray-300 hover:bg-slate-700"
                     }`}
                     variants={itemVariants}
                     whileHover={{ x: 10 }}
