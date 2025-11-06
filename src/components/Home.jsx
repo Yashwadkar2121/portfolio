@@ -6,9 +6,10 @@ import {
   Zap,
   Database,
   Layout,
-  Award,
-  Users,
-  Clock,
+  Cpu,
+  GitBranch,
+  Smartphone,
+  Cloud,
 } from "lucide-react";
 
 const Home = () => {
@@ -34,30 +35,35 @@ const Home = () => {
     },
   };
 
-  const achievements = [
+  const techAreas = [
     {
-      icon: Award,
-      title: "Pixel-Perfect Implementation",
-      description:
-        "Transforming Figma designs into responsive, client-facing web applications with precise attention to detail",
+      icon: Layout,
+      title: "Frontend Development",
+      skills: [
+        "React.js",
+        "Tailwind CSS",
+        "JavaScript ES6+",
+        "Responsive Design",
+      ],
+      color: "text-blue-400",
     },
     {
-      icon: Users,
-      title: "User-Centric Design",
-      description:
-        "Enhancing user engagement through refined UI interactions and intuitive user experiences",
+      icon: Database,
+      title: "Backend Development",
+      skills: ["Node.js", "Express.js", "RESTful APIs", "Authentication"],
+      color: "text-green-400",
     },
     {
-      icon: Clock,
-      title: "Performance Optimized",
-      description:
-        "Achieving faster load times through efficient API calls and optimized component architecture",
+      icon: Cpu,
+      title: "Database Management",
+      skills: ["MongoDB", "MySQL", "Database Design", "Data Modeling"],
+      color: "text-purple-400",
     },
     {
-      icon: Shield,
-      title: "Full-Stack Solutions",
-      description:
-        "End-to-end development from dynamic UIs to robust RESTful APIs and database management",
+      icon: Cloud,
+      title: "DevOps & Tools",
+      skills: ["Git & GitHub", "Vercel", "Vite", "Postman", "Figma"],
+      color: "text-cyan-400",
     },
   ];
 
@@ -161,73 +167,65 @@ const Home = () => {
             </motion.div>
           </div>
 
-          {/* Right Content - Achievements */}
+          {/* Right Content - Tech Expertise */}
           <motion.div className="space-y-6" variants={itemVariants}>
             <h3 className="text-2xl font-bold text-white text-center lg:text-left">
-              What I Deliver
+              Tech Expertise
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {achievements.map((achievement, index) => (
+              {techAreas.map((area, index) => (
                 <motion.div
-                  key={achievement.title}
+                  key={area.title}
                   className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-cyan-500/50 transition-all duration-300 group"
                   variants={itemVariants}
                   whileHover={{
-                    scale: 1.05,
-                    y: -5,
+                    scale: 1.02,
+                    y: -3,
                     transition: { delay: 0 },
                   }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 + 0.5 }}
                 >
-                  <div className="flex items-start space-x-4">
-                    <div className="p-2 bg-cyan-500/20 rounded-lg flex-shrink-0">
-                      <achievement.icon className="w-6 h-6 text-cyan-400" />
+                  <div className="flex items-center mb-4">
+                    <div className={`p-2 bg-cyan-500/20 rounded-lg mr-3`}>
+                      <area.icon className={`w-5 h-5 ${area.color}`} />
                     </div>
-                    <div>
-                      <h4 className="text-white font-semibold text-sm mb-2">
-                        {achievement.title}
-                      </h4>
-                      <p className="text-gray-300 text-xs leading-relaxed">
-                        {achievement.description}
-                      </p>
-                    </div>
+                    <h4 className="text-white font-semibold text-sm">
+                      {area.title}
+                    </h4>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {area.skills.map((skill, skillIndex) => (
+                      <span
+                        key={skill}
+                        className="px-2 py-1 bg-cyan-500/10 text-cyan-400 text-xs rounded-md border border-cyan-500/20"
+                      >
+                        {skill}
+                      </span>
+                    ))}
                   </div>
                 </motion.div>
               ))}
             </div>
 
-            {/* Experience Highlights */}
-            <motion.div className="space-y-4" variants={itemVariants}>
-              <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 backdrop-blur-sm rounded-xl p-6 border border-cyan-500/20">
-                <div className="flex items-center mb-2">
-                  <Zap className="w-5 h-5 text-cyan-400 mr-2" />
-                  <h4 className="text-white font-semibold">
-                    Professional Journey
-                  </h4>
-                </div>
-                <p className="text-gray-300 text-sm">
-                  <span className="text-cyan-400">1+ years</span> of hands-on
-                  experience in full-stack development, working with startups
-                  and established companies to deliver high-quality web
-                  solutions.
-                </p>
+            {/* Quick Stats */}
+            <motion.div
+              className="grid grid-cols-3 gap-4"
+              variants={itemVariants}
+            >
+              <div className="text-center p-4 bg-white/5 rounded-lg border border-white/10">
+                <div className="text-2xl font-bold text-cyan-400">10+</div>
+                <div className="text-xs text-gray-400 mt-1">Projects</div>
               </div>
-
-              <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-sm rounded-xl p-6 border border-purple-500/20">
-                <div className="flex items-center mb-2">
-                  <Code className="w-5 h-5 text-purple-400 mr-2" />
-                  <h4 className="text-white font-semibold">
-                    Technical Excellence
-                  </h4>
-                </div>
-                <p className="text-gray-300 text-sm">
-                  Expertise in modern web technologies including React, Node.js,
-                  MongoDB, and Tailwind CSS, with a focus on writing clean,
-                  maintainable code.
-                </p>
+              <div className="text-center p-4 bg-white/5 rounded-lg border border-white/10">
+                <div className="text-2xl font-bold text-green-400">1+</div>
+                <div className="text-xs text-gray-400 mt-1">Years Exp</div>
+              </div>
+              <div className="text-center p-4 bg-white/5 rounded-lg border border-white/10">
+                <div className="text-2xl font-bold text-purple-400">5+</div>
+                <div className="text-xs text-gray-400 mt-1">Technologies</div>
               </div>
             </motion.div>
           </motion.div>
