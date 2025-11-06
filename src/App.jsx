@@ -1,6 +1,7 @@
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import About from "./components/About";
+import Skills from "./components/Skills";
 import Projects from "./components/Projects";
 import Experience from "./components/Experience";
 import Education from "./components/Education";
@@ -8,7 +9,7 @@ import Contact from "./components/Contant";
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-900">
       <Navbar />
 
       <main>
@@ -18,6 +19,10 @@ function App() {
 
         <section id="about">
           <About />
+        </section>
+
+        <section id="skills">
+          <Skills />
         </section>
 
         <section id="projects">

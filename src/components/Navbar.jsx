@@ -9,6 +9,7 @@ const Navbar = () => {
   const navItems = [
     { name: "Home", id: "home" },
     { name: "About", id: "about" },
+    { name: "Skills", id: "skills" },
     { name: "Projects", id: "projects" },
     { name: "Experience", id: "experience" },
     { name: "Education", id: "education" },
@@ -113,7 +114,7 @@ const Navbar = () => {
           </motion.div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex space-x-6 lg:space-x-8">
             {navItems.map((item) => (
               <motion.button
                 key={item.id}
