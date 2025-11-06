@@ -101,46 +101,92 @@ const Experience = () => {
                 }`}
               >
                 <motion.div
-                  className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-cyan-500/50 transition-all duration-300"
-                  whileHover={{ scale: 1.02 }}
+                  className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-cyan-500/50 transition-all duration-300 group"
+                  whileHover={{ scale: 1.02, y: -2 }}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3">
-                    <div className="flex-1">
-                      <h3 className="text-lg sm:text-xl font-bold text-white mb-2 leading-tight">
-                        {exp.position}
-                      </h3>
-                      <div className="flex items-center text-cyan-400 mb-1 text-sm sm:text-base">
-                        <Award className="w-4 h-4 mr-2 flex-shrink-0" />
+                  {/* Header Section - Sequential Flow */}
+                  <div className="mb-6 space-y-4">
+                    {/* Position Title - Most Prominent */}
+                    <h3 className="text-2xl font-bold text-white leading-tight">
+                      {exp.position}
+                    </h3>
+
+                    {/* Company Name with Icon */}
+                    <div className="flex items-center text-cyan-400">
+                      <Award className="w-5 h-5 mr-3 flex-shrink-0" />
+                      <span className="font-semibold text-lg">
                         {exp.company}
-                      </div>
-                      <div className="flex items-center text-gray-400 text-xs sm:text-sm">
-                        <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-                        {exp.location}
-                      </div>
+                      </span>
                     </div>
-                    <div className="flex items-center text-gray-300 text-xs sm:text-sm bg-cyan-500/20 px-3 py-1 rounded-full self-start">
-                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-                      {exp.period}
+
+                    {/* Period and Location in a row */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+                      {/* Period Badge */}
+                      <div className="flex items-center text-gray-300 bg-cyan-500/20 px-4 py-2 rounded-full w-fit">
+                        <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <span className="text-sm font-medium">
+                          {exp.period}
+                        </span>
+                      </div>
+
+                      {/* Location */}
+                      <div className="flex items-center text-gray-400">
+                        <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <span className="text-sm">{exp.location}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <ul className="space-y-2">
-                    {exp.achievements.map((achievement, idx) => (
-                      <li
-                        key={idx}
-                        className="text-gray-300 text-xs sm:text-sm flex items-start"
-                      >
-                        <span className="text-cyan-400 mr-2 mt-1 flex-shrink-0">
-                          •
-                        </span>
-                        <span className="leading-relaxed">{achievement}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {/* Achievements Section */}
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold text-sm uppercase tracking-wide text-gray-400">
+                      Key Achievements:
+                    </h4>
+                    <ul className="space-y-3">
+                      {exp.achievements.map((achievement, idx) => (
+                        <motion.li
+                          key={idx}
+                          className="text-gray-300 text-sm flex items-start group-hover:translate-x-1 transition-transform duration-200"
+                          whileHover={{ x: 5 }}
+                        >
+                          <span className="text-cyan-400 mr-3 mt-1 flex-shrink-0 text-lg">
+                            •
+                          </span>
+                          <span className="leading-relaxed text-base">
+                            {achievement}
+                          </span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Tech Stack Indicator */}
+                  <div className="mt-6 pt-4 border-t border-slate-700">
+                    <div className="flex items-center text-xs text-gray-400">
+                      <span className="mr-2">🛠️</span>
+                      Full-Stack Development • React • Node.js • MongoDB
+                    </div>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Total Experience Summary */}
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="text-center mt-12"
+        >
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 inline-block">
+            <p className="text-gray-300 text-lg">
+              <span className="text-cyan-400 font-bold">1+ Years</span> of
+              professional experience in full-stack development
+            </p>
+          </div>
         </motion.div>
       </div>
     </div>
