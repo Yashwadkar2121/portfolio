@@ -26,6 +26,13 @@ const Contact = () => {
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
 
+  // EmailJS configuration from environment variables
+  const emailConfig = {
+    serviceID: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+    templateID: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+    publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -101,6 +108,20 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate environment variables
+    if (
+      !emailConfig.serviceID ||
+      !emailConfig.templateID ||
+      !emailConfig.publicKey
+    ) {
+      console.error(
+        "EmailJS configuration is missing. Please check your environment variables."
+      );
+      setSubmitStatus("error");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus("");
 
@@ -131,23 +152,20 @@ const Contact = () => {
   };
 
   const sendEmailWithEmailJS = () => {
-    const serviceID = "service_s5k6qoi";
-    const templateID = "template_4ygyxng";
-    const publicKey = "KUCCaUJzQ5e7v2Hfk";
+    // Use environment variables
+    const { serviceID, templateID, publicKey } = emailConfig;
 
-    // Template parameters - EmailJS will use these to send FROM visitor TO you
+    // Template parameters
     const templateParams = {
-      to_name: "Yash", // Your name that will appear in the email
-      from_name: formData.name, // Visitor's name
-      from_email: formData.email, // Visitor's email (akki12@gmail.com)
+      to_name: "Yash",
+      from_name: formData.name,
+      from_email: formData.email,
       subject: formData.subject,
       message: formData.message,
-      reply_to: formData.email, // Important: This allows you to reply directly to visitor
+      reply_to: formData.email,
       attachment: formData.file ? formData.file.name : "No file attached",
       phone: "+91 9075425869",
       timestamp: new Date().toLocaleString(),
-
-      // Additional info for better organization
       visitor_email: formData.email,
       visitor_name: formData.name,
     };
@@ -155,6 +173,7 @@ const Contact = () => {
     return emailjs.send(serviceID, templateID, templateParams, publicKey);
   };
 
+  // Rest of your component remains the same...
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
