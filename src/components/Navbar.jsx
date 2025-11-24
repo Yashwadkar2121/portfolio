@@ -8,7 +8,7 @@ const Navbar = () => {
 
   const navItems = [
     { name: "Home", id: "home" },
-    { name: "About", id: "about" },
+    // { name: "About", id: "about" },
     { name: "Skills", id: "skills" },
     { name: "Projects", id: "projects" },
     { name: "Experience", id: "experience" },
@@ -49,10 +49,17 @@ const Navbar = () => {
 
   const handleNavClick = (id) => {
     setIsOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+
+    // Add a small delay to allow the menu to close before scrolling
+    setTimeout(() => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 300); // Match this delay with your menu animation duration
   };
 
   const menuVariants = {
