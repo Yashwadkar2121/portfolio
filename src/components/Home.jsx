@@ -1,15 +1,11 @@
 import { motion } from "framer-motion";
 import {
-  Code,
   Rocket,
-  Shield,
+  Award,
+  TrendingUp,
+  Users,
   Zap,
-  Database,
-  Layout,
-  Cpu,
-  GitBranch,
-  Smartphone,
-  Cloud,
+  CheckCircle,
 } from "lucide-react";
 
 const Home = () => {
@@ -35,36 +31,10 @@ const Home = () => {
     },
   };
 
-  const techAreas = [
-    {
-      icon: Layout,
-      title: "Frontend Development",
-      skills: [
-        "React.js",
-        "Tailwind CSS",
-        "JavaScript ES6+",
-        "Responsive Design",
-      ],
-      color: "text-blue-400",
-    },
-    {
-      icon: Database,
-      title: "Backend Development",
-      skills: ["Node.js", "Express.js", "RESTful APIs", "Authentication"],
-      color: "text-green-400",
-    },
-    {
-      icon: Cpu,
-      title: "Database Management",
-      skills: ["MongoDB", "MySQL", "Database Design", "Data Modeling"],
-      color: "text-purple-400",
-    },
-    {
-      icon: Cloud,
-      title: "DevOps & Tools",
-      skills: ["Git & GitHub", "Vercel", "Vite", "Postman", "Figma"],
-      color: "text-cyan-400",
-    },
+  const quickHighlights = [
+    "1+ Years MERN Stack Experience",
+    "Built 10+ Production Applications",
+    "Strong Problem-Solving Skills",
   ];
 
   return (
@@ -78,25 +48,27 @@ const Home = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex items-center">
         <motion.div
-          className="grid lg:grid-cols-2 gap-12 items-center w-full py-20"
+          className="w-full py-20"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          {/* Left Content */}
-          <div className="space-y-8">
+          {/* Main Content */}
+          <div className="max-w-4xl mx-auto text-center">
             <motion.div variants={itemVariants}>
+              {/* Status Badge */}
               <motion.div
-                className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6"
+                className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
                 <span className="text-green-400 text-sm font-medium">
-                  Available for new opportunities
+                  Actively seeking full-time opportunities
                 </span>
               </motion.div>
 
+              {/* Hero Text */}
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
                 Hi, I'm{" "}
                 <motion.span
@@ -118,32 +90,48 @@ const Home = () => {
               </h1>
 
               <motion.h2
-                className="text-2xl md:text-3xl text-gray-300 mb-6 font-light"
+                className="text-3xl md:text-4xl text-gray-300 mb-6 font-light"
                 variants={itemVariants}
               >
                 MERN Stack Developer
               </motion.h2>
+
+              <motion.p
+                className="text-xl text-gray-300 leading-relaxed mb-10 max-w-3xl mx-auto"
+                variants={itemVariants}
+              >
+                Passionate about building{" "}
+                <span className="text-cyan-400 font-semibold">
+                  scalable web applications
+                </span>{" "}
+                that deliver exceptional user experiences. With{" "}
+                <span className="text-green-400 font-semibold">
+                  1+ year of professional experience
+                </span>
+                , I specialize in creating efficient, maintainable solutions
+                using modern web technologies.
+              </motion.p>
             </motion.div>
 
-            <motion.p
-              className="text-lg text-gray-300 leading-relaxed max-w-2xl"
+            {/* Quick Highlights */}
+            <motion.div
+              className="flex flex-wrap justify-center gap-4 mb-12"
               variants={itemVariants}
             >
-              Specializing in{" "}
-              <span className="text-cyan-400 font-semibold">React</span>,{" "}
-              <span className="text-green-400 font-semibold">Node.js</span>, and{" "}
-              <span className="text-green-500 font-semibold">MongoDB</span>.
-              Passionate about building{" "}
-              <span className="text-purple-400 font-semibold">
-                scalable web applications
-              </span>{" "}
-              with focus on performance, clean code, and seamless user
-              experiences.
-            </motion.p>
+              {quickHighlights.map((highlight, index) => (
+                <div
+                  key={index}
+                  className="flex items-center text-gray-300 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 text-sm"
+                >
+                  <CheckCircle className="w-4 h-4 text-green-400 mr-2" />
+                  {highlight}
+                </div>
+              ))}
+            </motion.div>
 
             {/* CTA Buttons */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-4 justify-center"
               variants={itemVariants}
             >
               <motion.a
@@ -153,7 +141,7 @@ const Home = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Rocket className="w-5 h-5 mr-2" />
-                View My Work
+                View My Projects
               </motion.a>
 
               <motion.a
@@ -162,73 +150,25 @@ const Home = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Get In Touch
+                Let's Connect
               </motion.a>
             </motion.div>
-          </div>
 
-          {/* Right Content - Tech Expertise */}
-          <motion.div className="space-y-6" variants={itemVariants}>
-            <h3 className="text-2xl font-bold text-white text-center lg:text-left">
-              Tech Expertise
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {techAreas.map((area, index) => (
-                <motion.div
-                  key={area.title}
-                  className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-cyan-500/50 transition-all duration-300 group"
-                  variants={itemVariants}
-                  whileHover={{
-                    scale: 1.02,
-                    y: -3,
-                    transition: { delay: 0 },
-                  }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 + 0.5 }}
-                >
-                  <div className="flex items-center mb-4">
-                    <div className={`p-2 bg-cyan-500/20 rounded-lg mr-3`}>
-                      <area.icon className={`w-5 h-5 ${area.color}`} />
-                    </div>
-                    <h4 className="text-white font-semibold text-sm">
-                      {area.title}
-                    </h4>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {area.skills.map((skill, skillIndex) => (
-                      <span
-                        key={skill}
-                        className="px-2 py-1 bg-cyan-500/10 text-cyan-400 text-xs rounded-md border border-cyan-500/20"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Quick Stats */}
+            {/* Experience Summary */}
             <motion.div
-              className="grid grid-cols-3 gap-4"
+              className="mt-12 p-6 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 max-w-2xl mx-auto"
               variants={itemVariants}
             >
-              <div className="text-center p-4 bg-white/5 rounded-lg border border-white/10">
-                <div className="text-2xl font-bold text-cyan-400">10+</div>
-                <div className="text-xs text-gray-400 mt-1">Projects</div>
-              </div>
-              <div className="text-center p-4 bg-white/5 rounded-lg border border-white/10">
-                <div className="text-2xl font-bold text-green-400">1+</div>
-                <div className="text-xs text-gray-400 mt-1">Years Exp</div>
-              </div>
-              <div className="text-center p-4 bg-white/5 rounded-lg border border-white/10">
-                <div className="text-2xl font-bold text-purple-400">5+</div>
-                <div className="text-xs text-gray-400 mt-1">Technologies</div>
-              </div>
+              <p className="text-gray-300 text-lg">
+                🚀 Transitioned from{" "}
+                <span className="text-cyan-400">Electrical Engineering</span> to{" "}
+                <span className="text-green-400">Software Development</span>,
+                applying analytical problem-solving skills to build robust web
+                applications. Currently seeking opportunities to contribute to
+                innovative projects and grow with forward-thinking teams.
+              </p>
             </motion.div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
 
