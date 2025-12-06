@@ -9,8 +9,7 @@ const Projects = () => {
   const projects = [
     {
       title: "Medication Reminder App",
-      description:
-        "JWT-authenticated system for scheduling medication alerts.",
+      description: "JWT-authenticated system for scheduling medication alerts.",
       tech: ["React.js", "Node.js", "Express.js", "MySQL", "Tailwind CSS"],
       github: "https://github.com/Yashwadkar2121/medication-reminder-app",
       live: "#",
@@ -23,7 +22,7 @@ const Projects = () => {
       description:
         "Vite-optimized React.js clone with React Router for seamless navigation",
       tech: ["React.js", "Vite", "Tailwind CSS", "Vercel"],
-      github: "#",
+      github: "https://github.com/Yashwadkar2121/Printify---Home-Page.git",
       live: "https://printify-home-page.vercel.app",
       deployed: true,
       featured: false,
@@ -34,7 +33,7 @@ const Projects = () => {
       description:
         "Secure JWT-based authentication system with role-based access control",
       tech: ["React.js", "Node.js", "Express.js", "MongoDB", "JWT"],
-      github: "#",
+      github: "https://github.com/Yashwadkar2121/Admin-Pannal.git",
       live: "#", // Not deployed
       deployed: false,
       featured: false,

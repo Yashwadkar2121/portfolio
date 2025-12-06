@@ -6,7 +6,7 @@ const Education = () => {
     {
       degree: "Bachelor of Engineering (Electrical Engineering)",
       institution: "Savitribai Phule Pune University",
-      period: "August 2019 - August 2023",
+      period: "2019 - 2023",
       grade: "CGPA: 6.73",
     },
     {
