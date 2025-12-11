@@ -11,7 +11,7 @@ import {
   X,
   Check,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import emailjs from "@emailjs/browser";
 
 const Contact = () => {
@@ -516,7 +516,7 @@ const Contact = () => {
                             </span>{" "}
                             or drag and drop
                           </p>
-                          <p className="text-xs sm:text-5 text-gray-500">
+                          <p className="text-xs text-gray-500">
                             PDF, DOC, DOCX, TXT, JPEG, PNG, PPT (MAX. 5MB)
                           </p>
                         </div>
