@@ -25,15 +25,19 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("");
   const [copied, setCopied] = useState(false);
-  const [showToast, setShowToast] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
 
-  // EmailJS configuration from environment variables
   const emailConfig = {
     serviceID: import.meta.env.VITE_EMAILJS_SERVICE_ID,
     templateID: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
     publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+  };
+
+  const cloudinaryConfig = {
+    cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
+    uploadPreset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
   };
 
   const containerVariants = {
@@ -52,18 +56,13 @@ const Contact = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        duration: 0.5,
-      },
+      transition: { duration: 0.5 },
     },
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
@@ -87,39 +86,112 @@ const Contact = () => {
 
       if (!allowedTypes.includes(file.type)) {
         showToastNotification(
-          "Please upload PDF, DOC, DOCX, TXT, JPEG, PNG, or PPT files only"
+          "Please upload PDF, DOC, DOCX, TXT, JPEG, PNG, or PPT files only",
         );
         return;
       }
 
-      setFormData((prev) => ({
-        ...prev,
-        file: file,
-      }));
+      setFormData((prev) => ({ ...prev, file: file }));
     }
   };
 
   const handleRemoveFile = () => {
-    setFormData((prev) => ({
-      ...prev,
-      file: null,
-    }));
+    setFormData((prev) => ({ ...prev, file: null }));
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+  };
+
+  const getResourceType = (fileType) => {
+    if (fileType.startsWith("image/")) {
+      return "image";
+    } else {
+      return "raw";
+    }
+  };
+
+  const uploadFileToCloudinary = async (file) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", cloudinaryConfig.uploadPreset);
+
+    const resourceType = getResourceType(file.type);
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/${resourceType}/upload`,
+        {
+          method: "POST",
+          body: data,
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = "Failed to upload file";
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error?.message || errorMessage;
+        } catch (e) {
+          errorMessage = response.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+
+      if (!result.secure_url) {
+        throw new Error("No file URL returned from Cloudinary");
+      }
+
+      let fileUrl = result.secure_url;
+
+      if (fileUrl.startsWith("https:/") && !fileUrl.startsWith("https://")) {
+        fileUrl = fileUrl.replace("https:/", "https://");
+      }
+
+      if (resourceType === "raw") {
+        if (fileUrl.includes("/image/upload/")) {
+          fileUrl = fileUrl.replace("/image/upload/", "/raw/upload/");
+        }
+        if (
+          fileUrl.includes("/upload/") &&
+          !fileUrl.includes("/raw/upload/") &&
+          !fileUrl.includes("/image/upload/")
+        ) {
+          fileUrl = fileUrl.replace("/upload/", "/raw/upload/");
+        }
+      }
+
+      // console.log("Generated URL:", fileUrl);
+      return fileUrl;
+    } catch (error) {
+      console.error("Cloudinary Upload Error:", error);
+      throw new Error(`File upload failed: ${error.message}`);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate environment variables
     if (
       !emailConfig.serviceID ||
       !emailConfig.templateID ||
       !emailConfig.publicKey
     ) {
       showToastNotification(
-        "Email service is not configured. Please try emailing directly."
+        "Email service is not configured. Please try emailing directly.",
+      );
+      setSubmitStatus("error");
+      return;
+    }
+
+    if (
+      formData.file &&
+      (!cloudinaryConfig.cloudName || !cloudinaryConfig.uploadPreset)
+    ) {
+      showToastNotification(
+        "File upload service is not configured. Please remove the file or try again later.",
       );
       setSubmitStatus("error");
       return;
@@ -127,12 +199,32 @@ const Contact = () => {
 
     setIsSubmitting(true);
     setSubmitStatus("");
+    setUploadProgress(0);
 
     try {
-      await sendEmailWithEmailJS();
-      setSubmitStatus("success");
+      let attachmentUrl = "";
+      let attachmentName = "No file attached";
 
-      // Reset form
+      if (formData.file) {
+        setUploadProgress(30);
+        showToastNotification("Uploading file to Cloudinary...");
+
+        attachmentUrl = await uploadFileToCloudinary(formData.file);
+        attachmentName = formData.file.name;
+
+        setUploadProgress(70);
+        showToastNotification("File uploaded successfully!");
+
+        // console.log("Final URL being sent:", attachmentUrl);
+      }
+
+      setUploadProgress(85);
+      await sendEmailWithEmailJS(attachmentUrl, attachmentName);
+
+      setUploadProgress(100);
+      setSubmitStatus("success");
+      showToastNotification("Message sent successfully! 🎉");
+
       setFormData({
         name: "",
         email: "",
@@ -146,54 +238,70 @@ const Contact = () => {
       if (formRef.current) {
         formRef.current.reset();
       }
+
+      setTimeout(() => setUploadProgress(0), 3000);
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Error:", error);
       setSubmitStatus("error");
+      showToastNotification(
+        error.message || "Failed to send message. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const sendEmailWithEmailJS = () => {
-    // Use environment variables
+  const sendEmailWithEmailJS = (attachmentUrl, attachmentName) => {
     const { serviceID, templateID, publicKey } = emailConfig;
 
-    // Template parameters
+    let cleanUrl = attachmentUrl || "";
+    if (cleanUrl) {
+      if (cleanUrl.startsWith("https:/") && !cleanUrl.startsWith("https://")) {
+        cleanUrl = cleanUrl.replace("https:/", "https://");
+      }
+      cleanUrl = cleanUrl.replace(/\/+$/, "");
+    }
+
+    // EmailJS has no {{#if}} support — build the conditional button as
+    // ready-made HTML here instead, and inject it as one variable.
+    const attachmentButton = cleanUrl
+      ? `<a href="${cleanUrl}" target="_blank" style="display:inline-block; background-color:#ffffff; color:#0f172a; font-size:14px; font-weight:600; text-decoration:none; padding:12px 24px; border-radius:7px; border:1px solid #cbd5e1;">View Document</a>`
+      : "";
+
     const templateParams = {
       to_name: "Yash",
-      from_name: formData.name,
-      from_email: formData.email,
-      subject: formData.subject,
-      message: formData.message,
-      reply_to: formData.email,
-      attachment: formData.file ? formData.file.name : "No file attached",
+      from_name: String(formData.name || "").trim(),
+      from_email: String(formData.email || "").trim(),
+      subject: String(formData.subject || "").trim(),
+      message: String(formData.message || "").trim(),
+      reply_to: String(formData.email || "").trim(),
+      attachment_name: String(attachmentName || "No file attached").trim(),
+      attachment_url: cleanUrl,
+      attachment_button: attachmentButton,
       phone: "+91 9075425869",
       timestamp: new Date().toLocaleString(),
-      visitor_email: formData.email,
-      visitor_name: formData.name,
+      visitor_email: String(formData.email || "").trim(),
+      visitor_name: String(formData.name || "").trim(),
     };
+
+    // console.log("Sending email with params:", templateParams);
 
     return emailjs.send(serviceID, templateID, templateParams, publicKey);
   };
 
-  // Toast notification
   const showToastNotification = (message) => {
-    setShowToast(true);
-    // Remove any existing toast
     const existingToast = document.getElementById("contact-toast");
     if (existingToast) {
       existingToast.remove();
     }
 
-    // Create toast element with Tailwind animations
     const toast = document.createElement("div");
     toast.id = "contact-toast";
     toast.className =
-      "fixed top-6 right-6 bg-slate-800 border border-slate-700 text-white px-6 py-4 rounded-lg shadow-xl z-50 animate-slideInRight transform transition-all duration-300";
+      "fixed top-6 right-6 bg-slate-800 border border-slate-700 text-white px-6 py-4 rounded-lg shadow-xl z-50 animate-slideInRight transform transition-all duration-300 max-w-md";
     toast.textContent = message;
     document.body.appendChild(toast);
 
-    // Remove toast after 3 seconds
     setTimeout(() => {
       toast.classList.remove("animate-slideInRight");
       toast.classList.add("animate-slideOutRight");
@@ -201,12 +309,10 @@ const Contact = () => {
         if (toast.parentNode) {
           document.body.removeChild(toast);
         }
-        setShowToast(false);
       }, 300);
     }, 3000);
   };
 
-  // Handle email click
   const handleEmailClick = () => {
     const email = "yashwadkar079@gmail.com";
     const subject = "Portfolio Inquiry";
@@ -214,11 +320,10 @@ const Contact = () => {
       "Hello Yash,\n\nI came across your portfolio and wanted to connect regarding...";
 
     window.location.href = `mailto:${email}?subject=${encodeURIComponent(
-      subject
+      subject,
     )}&body=${encodeURIComponent(body)}`;
   };
 
-  // Handle phone click
   const handlePhoneClick = () => {
     const phoneNumber = "+919075425869";
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -230,7 +335,6 @@ const Contact = () => {
     }
   };
 
-  // Simple clipboard copy
   const copyToClipboard = (text) => {
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard
@@ -248,7 +352,6 @@ const Contact = () => {
     }
   };
 
-  // Fallback copy method
   const fallbackCopyToClipboard = (text) => {
     const textArea = document.createElement("textarea");
     textArea.value = text;
@@ -272,9 +375,22 @@ const Contact = () => {
     document.body.removeChild(textArea);
   };
 
+  const ProgressBar = ({ progress }) => {
+    if (progress === 0) return null;
+    return (
+      <div className="w-full bg-slate-700 rounded-full h-2 mt-2 overflow-hidden">
+        <div
+          className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${progress}%` }}
+        >
+          <div className="w-full h-full bg-gradient-to-r from-cyan-400 to-blue-500 animate-pulse"></div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-20 relative overflow-hidden">
-      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 -left-20 w-60 h-60 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
@@ -315,7 +431,6 @@ const Contact = () => {
           viewport={{ once: true }}
           className="grid lg:grid-cols-2 gap-12"
         >
-          {/* Contact Information */}
           <div className="space-y-8">
             <motion.h3
               className="text-3xl font-bold text-white animate-fadeIn"
@@ -334,7 +449,6 @@ const Contact = () => {
             </motion.p>
 
             <motion.div className="space-y-6" variants={itemVariants}>
-              {/* Email - Clickable */}
               <motion.div
                 className="flex items-center space-x-4 p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-cyan-500/50 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:shadow-cyan-500/10 animate-slideInLeft"
                 whileHover={{ scale: 1.02 }}
@@ -355,7 +469,6 @@ const Contact = () => {
                 </div>
               </motion.div>
 
-              {/* Phone - Clickable */}
               <motion.div
                 className="flex items-center space-x-4 p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-green-500/50 transition-all duration-300 group cursor-pointer relative animate-slideInLeft delay-100"
                 whileHover={{ scale: 1.02 }}
@@ -387,7 +500,6 @@ const Contact = () => {
                 </div>
               </motion.div>
 
-              {/* Location - Non-clickable */}
               <motion.div
                 className="flex items-center space-x-4 p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-purple-500/50 transition-all duration-300 animate-slideInLeft delay-200"
                 whileHover={{ scale: 1.02 }}
@@ -404,7 +516,6 @@ const Contact = () => {
               </motion.div>
             </motion.div>
 
-            {/* Social Links */}
             <motion.div
               className="flex space-x-4 animate-fadeInUp"
               variants={itemVariants}
@@ -432,7 +543,6 @@ const Contact = () => {
             </motion.div>
           </div>
 
-          {/* Contact Form */}
           <motion.div
             variants={itemVariants}
             className="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 animate-slideInRight hover:shadow-xl hover:shadow-cyan-500/5 transition-all duration-300"
@@ -499,7 +609,6 @@ const Contact = () => {
                 ></textarea>
               </div>
 
-              {/* File Upload Section */}
               <div className="animate-fadeIn delay-400">
                 <label className="block text-white text-sm font-medium mb-2">
                   Attach Document (Optional)
@@ -554,7 +663,8 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              <ProgressBar progress={uploadProgress} />
+
               <motion.button
                 type="submit"
                 disabled={isSubmitting}
@@ -565,7 +675,9 @@ const Contact = () => {
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Sending...
+                    {uploadProgress < 70
+                      ? "Uploading file..."
+                      : "Sending message..."}
                   </>
                 ) : (
                   <>
@@ -575,7 +687,6 @@ const Contact = () => {
                 )}
               </motion.button>
 
-              {/* Status Messages */}
               {submitStatus === "success" && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -605,20 +716,6 @@ const Contact = () => {
             </form>
           </motion.div>
         </motion.div>
-      </div>
-
-      {/* Toast Notification Container */}
-      <div className="fixed top-6 right-6 z-50">
-        {showToast && (
-          <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 100, opacity: 0 }}
-            className="bg-slate-800 border border-slate-700 text-white px-6 py-4 rounded-lg shadow-xl"
-          >
-            {/* Toast content will be injected here */}
-          </motion.div>
-        )}
       </div>
     </div>
   );
